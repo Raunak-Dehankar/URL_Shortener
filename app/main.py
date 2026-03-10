@@ -10,6 +10,8 @@ from app.models import Base
 
 Base.metadata.create_all(bind=engine)
 
+BASE_URL = "http://127.0.0.1:8000"
+
 app = FastAPI()
 
 
@@ -18,10 +20,15 @@ def shorten_url(request: URLRequest, db: Session = Depends(get_db)):
 
     service = URLService(db)
 
-    url = service.create_short_url(request.url)
+    try:
+        alias = request.validate_alias()
+        url = service.create_short_url(request.url, alias)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {
-        "short_url": f"http://localhost:8000/{url.short_code}"
+        "short_url": f"{BASE_URL}/{url.short_code}"
     }
 
 

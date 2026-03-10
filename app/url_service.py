@@ -8,9 +8,27 @@ class URLService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_short_url(self, original_url: str):
 
-        code = generate_short_code()
+    def create_short_url(self, original_url: str, alias: str = None):
+
+        if alias in [None, "", "string"]:
+            alias = None
+
+        if alias:
+            # check if alias already exists
+            existing = (
+                self.db.query(URL)
+                .filter(URL.short_code == alias)
+                .first()
+            )
+
+            if existing:
+                raise ValueError("Alias already in use")
+
+            code = alias
+
+        else:
+            code = self._generate_unique_code()
 
         db_url = URL(
             original_url=original_url,
@@ -31,3 +49,19 @@ class URLService:
             .filter(URL.short_code == code)
             .first()
         )
+
+
+    def _generate_unique_code(self):
+
+        while True:
+
+            code = generate_short_code()
+
+            existing = (
+                self.db.query(URL)
+                .filter(URL.short_code == code)
+                .first()
+            )
+
+            if not existing:
+                return code
