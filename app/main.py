@@ -8,15 +8,51 @@ from app.url_service import URLService
 from app.database import get_db, engine
 from app.models import Base
 
+from app.user import User
+from app.schemas import UserCreate, UserLogin
+from app.auth import hash_password, verify_password, create_access_token, verify_token
+
+from fastapi.security import HTTPBearer
+from fastapi import Security
+from jose import jwt
+
 Base.metadata.create_all(bind=engine)
 
 BASE_URL = "http://127.0.0.1:8000"
 
 app = FastAPI()
 
+@app.post("/register")
+def register(user: UserCreate, db: Session = Depends(get_db)):
+
+    new_user = User(
+        username=user.username,
+        email=user.email,
+        password=hash_password(user.password)
+    )
+
+    db.add(new_user)
+    db.commit()
+
+    return {"message": "user created"}
+
+@app.post("/login")
+def login(user: UserLogin, db: Session = Depends(get_db)):
+
+    db_user = db.query(User).filter(User.username == user.username).first()
+
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Invalid username")
+
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+    token = create_access_token({"sub": db_user.username})
+
+    return {"access_token": token}
 
 @app.post("/shorten")
-def shorten_url(request: URLRequest, db: Session = Depends(get_db)):
+def shorten_url(request: URLRequest, db: Session = Depends(get_db), user = Depends(verify_token)):
 
     service = URLService(db)
 
