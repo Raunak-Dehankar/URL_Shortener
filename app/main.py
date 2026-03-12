@@ -6,7 +6,7 @@ from app.database import get_db
 from app.schemas import URLRequest
 from app.url_service import URLService
 from app.database import get_db, engine
-from app.models import Base
+from app.models import Base, URL
 
 from app.user import User
 from app.schemas import UserCreate, UserLogin
@@ -113,6 +113,23 @@ def shorten_url(
         "short_url": f"{BASE_URL}/{url.short_code}"
     }
 
+@app.get("/myurls")
+def get_user_urls(
+    db: Session = Depends(get_db),
+    user = Depends(verify_token)
+):
+
+    urls = db.query(URL).filter(URL.user_id == user.id).all()
+
+    return [
+        {
+            "id": u.id,
+            "original_url": u.original_url,
+            "short_url": f"{BASE_URL}/{u.short_code}",
+            "clicks": u.clicks
+        }
+        for u in urls
+    ]
 
 @app.get("/{short_code}")
 def redirect(short_code: str, db: Session = Depends(get_db)):
@@ -131,3 +148,24 @@ def redirect(short_code: str, db: Session = Depends(get_db)):
     db.commit()
 
     return RedirectResponse(url.original_url)
+
+
+@app.delete("/delete/{url_id}")
+def delete_url(
+    url_id: int,
+    db: Session = Depends(get_db),
+    user = Depends(verify_token)
+):
+
+    url = db.query(URL).filter(
+        URL.id == url_id,
+        URL.user_id == user.id
+    ).first()
+
+    if not url:
+        raise HTTPException(status_code=404, detail="URL not found")
+
+    db.delete(url)
+    db.commit()
+
+    return {"message": "URL deleted"}

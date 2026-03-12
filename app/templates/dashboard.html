@@ -9,6 +9,12 @@ if(!token){
 }
 
 </script>
+<script>function copyToClipboard(text){
+navigator.clipboard.writeText(text)
+alert("Copied to clipboard")
+}</script>
+
+
 <head>
 <title>Dashboard</title>
 <link rel="stylesheet" href="/static/style.css">
@@ -26,6 +32,10 @@ if(!token){
 <button onclick="logout()">Logout</button>
 
 <p id="result"></p>
+
+<h3>Your URLs</h3>
+
+<div id="urlList"></div>
 
 <script src="/static/script.js"></script>
 

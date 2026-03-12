@@ -74,7 +74,68 @@ alias: alias
 
 let data = await res.json()
 
-document.getElementById("result").innerText = data.short_url
+document.getElementById("result").innerHTML =
+data.short_url +
+` <button onclick="copyToClipboard('${data.short_url}')">Copy</button>`
+
+loadUrls()
+}
+
+async function deleteUrl(id){
+
+let token = localStorage.getItem("token")
+
+await fetch(API + "/delete/" + id,{
+method:"DELETE",
+headers:{
+"Authorization":"Bearer " + token
+}
+})
+
+loadUrls()
+}
+
+async function loadUrls(){
+
+let token = localStorage.getItem("token")
+
+let res = await fetch(API + "/myurls", {
+headers:{
+"Authorization":"Bearer " + token
+}
+})
+
+let urls = await res.json()
+
+let list = document.getElementById("urlList")
+
+list.innerHTML = ""
+
+urls.forEach(u => {
+
+list.innerHTML += `
+<div style="margin:10px;padding:10px;border:1px solid gray">
+
+<p>
+<strong>Short:</strong> ${u.short_url}
+<button onclick="copyToClipboard('${u.short_url}')">Copy</button>
+</p>
+
+<p>
+<strong>Original:</strong> ${u.original_url}
+</p>
+
+<p>
+Clicks: ${u.clicks}
+</p>
+
+<button onclick="deleteUrl(${u.id})">Delete</button>
+
+</div>
+`
+
+})
+
 }
 
 function logout(){
@@ -84,3 +145,6 @@ localStorage.removeItem("token")
 window.location="/"
 
 }
+
+loadUrls()
+
