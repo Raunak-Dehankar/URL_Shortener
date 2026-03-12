@@ -9,7 +9,15 @@ class URLService:
         self.db = db
 
 
-    def create_short_url(self, original_url: str, alias: str = None):
+    def create_short_url(self, original_url: str, user_id, alias: str = None):
+
+        short_code = alias if alias else generate_short_code()
+
+        new_url = URL(
+            original_url=str,
+            short_code=short_code,
+            user_id=user_id
+    )
 
         if alias in [None, "", "string"]:
             alias = None

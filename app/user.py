@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from app.database import Base
 
 class User(Base):
@@ -9,3 +9,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True)
     password = Column(String)
+    original_url = Column(String)
+    short_code = Column(String, unique=True)
+    clicks = Column(Integer, default=0)
+    user_id = Column(Integer, ForeignKey("users.id"))
