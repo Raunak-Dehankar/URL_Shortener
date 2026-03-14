@@ -114,27 +114,73 @@ list.innerHTML = ""
 urls.forEach(u => {
 
 list.innerHTML += `
-<div style="margin:10px;padding:10px;border:1px solid gray">
 
-<p>
-<strong>Short:</strong> ${u.short_url}
-<button onclick="copyToClipboard('${u.short_url}')">Copy</button>
-</p>
+<div class="url-item">
 
-<p>
-<strong>Original:</strong> ${u.original_url}
-</p>
+<div class="url-title">
+${u.short_url}
+</div>
 
-<p>
+<div class="url-original">
+${u.original_url}
+</div>
+
+<div class="url-clicks">
 Clicks: ${u.clicks}
-</p>
+</div>
 
-<button onclick="deleteUrl(${u.id})">Delete</button>
+<div class="url-buttons">
+
+<button class="copy-btn"
+onclick="copyToClipboard('${u.short_url}')">
+Copy
+</button>
+
+<button class="delete-btn"
+onclick="deleteUrl(${u.id})">
+Delete
+</button>
+
+<button class="qr-btn"
+onclick="showQR('${u.short_url}')">
+QR
+</button>
 
 </div>
+
+</div>
+
 `
 
 })
+
+}
+
+function showQR(url){
+
+let modal = document.getElementById("qrModal")
+let canvasArea = document.getElementById("qrCanvas")
+
+canvasArea.innerHTML = ""
+
+QRCode.toCanvas(url, {width:200}, function (error, canvas){
+
+if(error){
+console.error(error)
+return
+}
+
+canvasArea.appendChild(canvas)
+
+})
+
+modal.style.display = "flex"
+
+}
+
+function closeQR(){
+
+document.getElementById("qrModal").style.display = "none"
 
 }
 
