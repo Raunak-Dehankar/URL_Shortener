@@ -26,30 +26,30 @@ This project is a full-stack URL shortener web application built using Python wi
 
 1. This is the first login page the user gets. Any user can login if they have an account or create a new one. 
 
-![alt text](<initial login page-1.png>)
+![alt text](<images/initial login page-1.png>)
 
 2. If an invalid user tries to login, they get an Invalid credentials error. 
 
-![alt text](<invalid login-1.png>)
+![alt text](<images/invalid login-1.png>)
 
 3. After clicking on the register link, the user is redirected to the registration window where they can register with new username, password and email ID. 
 
-![alt text](<register webpage-1.png>)
-![alt text](<register webpage-2.png>)
+![alt text](<images/register webpage-1.png>)
+![alt text](<images/register webpage-2.png>)
 
 4. When the user is successfully registered, they are redirected to the login page when they can login with the new credentials. 
 
 5. After successful login, the user can access the dashboard where they can create short links for multiple longer link, with or without alias. 
 
-![alt text](<register webpage-3.png>)
+![alt text](<images/register webpage-3.png>)
 
 6. If the alias is already available or dosen't meet the security standards, then no link is generated and Undefined error is shown. All the list the user has saved in the database is displayed in their links tab. User can cody or delete those links. 
 
-![alt text](<succ link adding-1.png>)
-![alt text](<incorrect or repeated link genrated-1.png>)
+![alt text](<images/succ link adding-1.png>)
+![alt text](<images/incorrect or repeated link genrated-1.png>)
 
 7. User can then create unique QR codes for their shortened links from the list to easily share via image. 
 
-![alt text](<qr for shortened link-1.png>)
+![alt text](<images/qr for shortened link-1.png>)
 
 8. After the process is completed, user can logout which will save their progress. Logging out will redirect the webpage to login window. 
