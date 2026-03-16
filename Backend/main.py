@@ -3,19 +3,20 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
 from Backend.database import get_db, SessionLocal
-from Backend.schemas import URLRequest
-from Backend.url_service import URLService
+from Backend.Services.url_service import URLService
 from Backend.database import get_db, engine
-from Backend.models import Base, URL
+from Backend.Models.models import Base, URL
 
-from Backend.user import User
-from Backend.schemas import UserCreate, UserLogin
-from Backend.auth import hash_password, verify_password, create_access_token, verify_token
+from Backend.Models.user import User
+from Backend.ViewModels.usercreate_schema import UserCreate
+from Backend.ViewModels.userlogin_schema import UserLogin
+from Backend.ViewModels.URLrequest_schema import URLRequest
+
+from Backend.Services.auth_service import AuthService, get_current_user
 
 from fastapi import Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from Backend.auth import get_current_user
 from fastapi.responses import FileResponse
 
 Base.metadata.create_all(bind=engine)
@@ -32,9 +33,10 @@ db = SessionLocal()
 admin = db.query(User).filter(User.username == "admin").first()
 
 if not admin:
+    auth_service = AuthService(db)
     admin = User(
         username="admin",
-        password=hash_password("admin123"),
+        password=auth_service.hash_password("admin123"),
         role="admin",
         url_limit=9999,
         is_active=True
@@ -73,13 +75,14 @@ def admin_page(request: Request):
 @app.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
 
-    # check if username already exists
+    auth_service = AuthService(db)
+
     existing_user = db.query(User).filter(User.username == user.username).first()
 
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
 
-    hashed_password = hash_password(user.password)
+    hashed_password = auth_service.hash_password(user.password)
 
     new_user = User(
         username=user.username,
@@ -96,28 +99,32 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 @app.post("/login")
 def login(data: UserLogin, db: Session = Depends(get_db)):
 
+    auth_service = AuthService(db)
+
     db_user = db.query(User).filter(User.username == data.username).first()
 
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid username")
 
-    if not verify_password(data.password, db_user.password):
+    if not auth_service.verify_password(data.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid password")
     
     if not db_user.is_active:
         raise HTTPException(403,"User disabled")
 
-    token = create_access_token({"sub": db_user.username})
+    token = auth_service.create_access_token({"sub": db_user.username})
 
     return {
         "access_token": token,
         "role": db_user.role}
 
 @app.post("/shorten")
+
 def shorten_url(
+    
     request: URLRequest,
     db: Session = Depends(get_db),
-    user = Depends(verify_token)
+    user: User = Depends(get_current_user)
 ):
 
     service = URLService(db)
@@ -144,7 +151,7 @@ def shorten_url(
 @app.get("/myurls")
 def get_user_urls(
     db: Session = Depends(get_db),
-    user = Depends(verify_token)
+    user = Depends(get_current_user)
 ):
 
     urls = db.query(URL).filter(URL.user_id == user.id).all()
@@ -182,7 +189,7 @@ def redirect(short_code: str, db: Session = Depends(get_db)):
 def delete_url(
     url_id: int,
     db: Session = Depends(get_db),
-    user = Depends(verify_token)
+    user = Depends(get_current_user)
 ):
 
     url = db.query(URL).filter(
@@ -199,7 +206,7 @@ def delete_url(
     return {"message": "URL deleted"}
 
 @app.get("/admin")
-def admin_page(request: Request, user: User = Depends(verify_token)):
+def admin_page(request: Request, user: User = Depends(get_current_user)):
 
     if user.role != "admin":
         raise HTTPException(403,"Admin only")
@@ -244,7 +251,7 @@ def get_users(
 @app.get("/admin/urls")
 def get_all_urls(
     db: Session = Depends(get_db),
-    user: User = Depends(verify_token)
+    user: User = Depends(get_current_user)
 ):
 
     if user.role != "admin":
@@ -258,7 +265,7 @@ def get_all_urls(
 def disable_user(
     user_id: int,
     db: Session = Depends(get_db),
-    admin: User = Depends(verify_token)
+    admin: User = Depends(get_current_user)
 ):
 
     if admin.role != "admin":
@@ -280,7 +287,7 @@ def set_limit(
     user_id:int,
     limit:int,
     db:Session = Depends(get_db),
-    admin:User = Depends(verify_token)
+    admin:User = Depends(get_current_user)
 ):
 
     if admin.role != "admin":

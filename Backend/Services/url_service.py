@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from Backend.models import URL
-from Backend.utils import generate_short_code
+from Backend.Models.models import URL
+from Backend.Services.utils import generate_short_code
 from fastapi import HTTPException
-from Backend.user import User
+from Backend.Models.user import User
 
 class URLService:
 
@@ -17,7 +17,7 @@ class URLService:
         count = self.db.query(URL).filter(URL.user_id == user_id).count()
 
         if count >= user.url_limit:
-            HTTPException(
+            raise HTTPException(
                 status_code=403,
                 detail="URL limit reached")
 
