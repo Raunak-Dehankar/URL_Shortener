@@ -53,3 +53,8 @@ This project is a full-stack URL shortener web application built using Python wi
 ![alt text](<images/qr for shortened link-1.png>)
 
 8. After the process is completed, user can logout which will save their progress. Logging out will redirect the webpage to login window. 
+
+9. An Admin user can log into the login dashboard with predefined credentials. They have authority to view all links saved by each user, set a url generation limit on them and disable any user. 
+
+![alt text](<images/admin dashboard.png>)
+![alt text](<images/disabled user with limit set.png>)
