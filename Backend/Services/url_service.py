@@ -19,41 +19,25 @@ class URLService:
         if count >= user.url_limit:
             raise HTTPException(
                 status_code=403,
-                detail="URL limit reached")
-
-        short_code = alias if alias else generate_short_code()
-
-        new_url = URL(
-            original_url=str,
-            short_code=short_code,
-            user_id=user_id 
-    )
+                detail="URL limit reached"
+            )
 
         if alias in [None, "", "string"]:
             alias = None
 
         if alias:
-            # check if alias already exists
-            existing = (
-                self.db.query(URL)
-                .filter(URL.short_code == alias)
-                .first()
-            )
-
+            existing = self.db.query(URL).filter(URL.short_code == alias).first()
             if existing:
                 raise ValueError("Alias already in use")
-
             code = alias
-
         else:
             code = self._generate_unique_code()
 
-       # Create DB object
         db_url = URL(
-            original_url=original_url,
+            original_url=original_url,   # ✅ FIXED
             short_code=code,
             user_id=user_id
-    )
+        )
 
         self.db.add(db_url)
         self.db.commit()

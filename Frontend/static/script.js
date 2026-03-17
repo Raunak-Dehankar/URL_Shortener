@@ -1,5 +1,11 @@
 const API = "http://127.0.0.1:8000"
 
+const token = localStorage.getItem("token")
+
+if (!token) {
+    window.location = "/"
+}
+
 async function register(){
 
 let username = document.getElementById("reg_username").value
@@ -26,7 +32,7 @@ async function login(){
 let username = document.getElementById("username").value
 let password = document.getElementById("password").value
 
-let res = await fetch("/login",{
+let res = await fetch(API + "/login",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -196,5 +202,19 @@ window.location="/"
 
 }
 
-loadUrls()
+document.addEventListener("DOMContentLoaded", function(){
 
+    const token = localStorage.getItem("token")
+
+    if (!token) {
+        window.location = "/"
+        return
+    }
+
+    const urlList = document.getElementById("urlList")
+
+    if (urlList) {
+        loadUrls()
+    }
+
+})

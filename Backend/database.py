@@ -4,6 +4,20 @@ from sqlalchemy.orm import Session
 
 DATABASE_URL = "sqlite:///./urls.db"
 
+
+"""
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from Backend.Models.base import Base
+
+ DATABASE_URL = "sqlite:///./urls.db"
+
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(bind=engine)
+
+Base.metadata.create_all(bind=engine) """
+
 def get_db():
     db = SessionLocal()
     try:

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from Backend.database import get_db, SessionLocal
 from Backend.Services.url_service import URLService
-from Backend.database import get_db, engine
+#from Backend.database import get_db, engine
 from Backend.Models.models import Base, URL
 
 from Backend.Models.user import User
@@ -19,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 BASE_URL = "http://127.0.0.1:8000"
 
@@ -28,22 +28,26 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="Frontend/static"), name="static")
 templates = Jinja2Templates(directory="Frontend/templates")
 
-db = SessionLocal()
+def create_admin():
+    db = SessionLocal()
+    admin = db.query(User).filter(User.username == "admin").first()
 
-admin = db.query(User).filter(User.username == "admin").first()
+    if not admin:
+        auth_service = AuthService(db)
+        admin = User(
+            username="admin",
+            password=auth_service.hash_password("admin123"),
+            role="admin",
+            url_limit=9999,
+            is_active=True
+        )
+        db.add(admin)
+        db.commit()
 
-if not admin:
-    auth_service = AuthService(db)
-    admin = User(
-        username="admin",
-        password=auth_service.hash_password("admin123"),
-        role="admin",
-        url_limit=9999,
-        is_active=True
-    )
+    db.close()
 
-    db.add(admin)
-    db.commit()
+
+create_admin()
 
 @app.get("/")
 def login_page(request: Request):
@@ -59,16 +63,9 @@ def register_page(request: Request):
 def dashboard(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
-@app.get("/dashboard")
-def dashboard(current_user: User = Depends(get_current_user)):
-    return FileResponse("Frontend/static/dashboard.html")
-
-@app.get("/admin", response_class=HTMLResponse)
+@app.get("/admin")
 def admin_page(request: Request):
-    return templates.TemplateResponse(
-        "admin.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("admin.html", {"request": request})
 
 
 
@@ -166,24 +163,6 @@ def get_user_urls(
         for u in urls
     ]
 
-@app.get("/{short_code}")
-def redirect(short_code: str, db: Session = Depends(get_db)):
-
-    if short_code == "favicon.ico":
-        raise HTTPException(status_code=404)
-
-    service = URLService(db)
-
-    url = service.get_original_url(short_code)
-
-    if not url:
-        raise HTTPException(status_code=404, detail="URL not found")
-
-    url.clicks += 1
-    db.commit()
-
-    return RedirectResponse(url.original_url)
-
 
 @app.delete("/delete/{url_id}")
 def delete_url(
@@ -204,14 +183,6 @@ def delete_url(
     db.commit()
 
     return {"message": "URL deleted"}
-
-@app.get("/admin")
-def admin_page(request: Request, user: User = Depends(get_current_user)):
-
-    if user.role != "admin":
-        raise HTTPException(403,"Admin only")
-
-    return templates.TemplateResponse("admin.html", {"request":request})
 
 @app.get("/admin/users")
 def get_users(
@@ -301,3 +272,20 @@ def set_limit(
 
     return {"message":"Limit updated"}
 
+@app.get("/{short_code}")
+def redirect(short_code: str, db: Session = Depends(get_db)):
+
+    if short_code == "favicon.ico":
+        raise HTTPException(status_code=404)
+
+    service = URLService(db)
+
+    url = service.get_original_url(short_code)
+
+    if not url:
+        raise HTTPException(status_code=404, detail="URL not found")
+
+    url.clicks += 1
+    db.commit()
+
+    return RedirectResponse(url.original_url)
