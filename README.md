@@ -25,7 +25,7 @@ This project is a full-stack URL shortener web application built using Python wi
 
 ## Repository structure 
 
-![alt text](Readme-Readme-images/structure.png)
+![alt text](Readme-images/structure.png)
 
 ## Setup and Usage
 
