@@ -1,10 +1,22 @@
 const API = "http://127.0.0.1:8000"
 
-const token = localStorage.getItem("token")
+document.addEventListener("DOMContentLoaded", function(){
 
-if (!token) {
-    window.location = "/"
-}
+    const token = localStorage.getItem("token")
+
+    // Only protect dashboard page
+    if (window.location.pathname === "/dashboard" && !token) {
+        window.location = "/"
+        return
+    }
+
+    const urlList = document.getElementById("urlList")
+
+    if (urlList) {
+        loadUrls()
+    }
+
+})
 
 async function register(){
 
@@ -81,6 +93,12 @@ url: url,
 alias: alias
 })
 })
+if (!res.ok) {
+    let err = await res.text()
+    console.error("Shorten error:", err)
+    alert("Error shortening URL")
+    return
+}
 
 let data = await res.json()
 
@@ -115,6 +133,10 @@ headers:{
 }
 })
 
+if (!res.ok) {
+    console.error("Failed to load URLs")
+    return
+}
 let urls = await res.json()
 
 let list = document.getElementById("urlList")
@@ -201,20 +223,3 @@ localStorage.removeItem("token")
 window.location="/"
 
 }
-
-document.addEventListener("DOMContentLoaded", function(){
-
-    const token = localStorage.getItem("token")
-
-    if (!token) {
-        window.location = "/"
-        return
-    }
-
-    const urlList = document.getElementById("urlList")
-
-    if (urlList) {
-        loadUrls()
-    }
-
-})

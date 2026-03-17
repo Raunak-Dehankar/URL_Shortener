@@ -23,6 +23,76 @@ This project is a full-stack URL shortener web application built using Python wi
 - SQLAlchemy
 - JWT Authentication
 
+## Repository structure 
+
+URL_Shortener/
+│
+├── main.py
+├── requirements.txt
+│
+├── Backend/
+│   │
+│   ├── database.py
+│   │
+│   ├── Models/
+│   │   ├── models.py
+│   │   └── user.py
+│   │
+│   ├── ViewModels/
+│   │   ├── usercreate_schema.py
+│   │   ├── userlogin_schema.py
+│   │   └── URLrequest_schema.py
+│   │
+│   ├── Services/
+│   │   ├── auth_service.py
+│   │   ├── url_service.py
+│   │   └── utils.py
+│   │
+│   └── Routers/
+│       ├── ui_router.py
+│       ├── user_router.py
+│       ├── url_router.py
+│       └── admin_router.py
+│
+├── Frontend/
+│   │
+│   ├── templates/
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── dashboard.html
+│   │   └── admin.html
+│   │
+│   └── static/
+│       ├── script.js
+│       ├── admin.js
+│       ├── styles.css
+│       └── (qr library if any)
+│
+└── urls.db
+
+## Setup and Usage
+
+1. Clone the repository on your system
+
+git clone https://github.com/Raunak-Dehankar/URL_Shortener.git
+cd URL_Shortener
+
+2. Create Virtual Environment and activate it
+
+python -m venv venv
+venv\Scripts\activate
+
+3. Install Dependencies
+pip install -r requirements.txt
+
+4. Run the Backend Server
+uvicorn Backend.main:app --reload
+
+5. Open the Application in browser
+
+http://127.0.0.1:8000
+
+## Demo example
 
 1. This is the first login page the user gets. Any user can login if they have an account or create a new one. 
 
@@ -55,6 +125,10 @@ This project is a full-stack URL shortener web application built using Python wi
 8. After the process is completed, user can logout which will save their progress. Logging out will redirect the webpage to login window. 
 
 9. An Admin user can log into the login dashboard with predefined credentials. They have authority to view all links saved by each user, set a url generation limit on them and disable any user. 
+
+Default Admin
+Username: admin
+Password: admin123
 
 ![alt text](<images/admin dashboard.png>)
 ![alt text](<images/disabled user with limit set.png>)

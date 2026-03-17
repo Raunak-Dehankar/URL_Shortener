@@ -1,8 +1,5 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import FileResponse, HTMLResponse
-from Backend.Models.user import User
-from Backend.Services.auth_service import get_current_user
 
 
 router = APIRouter()
@@ -21,14 +18,8 @@ def register_page(request: Request):
 
 @router.get("/dashboard")
 def dashboard(request: Request):
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
-"""@router.get("/admin", response_class=HTMLResponse)
+@router.get("/admin")
 def admin_page(request: Request):
-    return templates.TemplateResponse(
-        "admin.html",
-        {"request": request}
-    ) """
+    return templates.TemplateResponse("admin.html", {"request": request})

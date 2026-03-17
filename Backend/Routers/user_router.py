@@ -1,23 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException, APIRouter
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from Backend.database import get_db, SessionLocal
-from Backend.Services.url_service import URLService
-from Backend.database import get_db, engine
-from Backend.Models.models import Base, URL
-
+from Backend.database import get_db
 from Backend.Models.user import User
 from Backend.ViewModels.usercreate_schema import UserCreate
 from Backend.ViewModels.userlogin_schema import UserLogin
-from Backend.ViewModels.URLrequest_schema import URLRequest
-
-from Backend.Services.auth_service import AuthService, get_current_user
-
-from fastapi import Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import FileResponse
+from Backend.Services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -60,10 +48,11 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid password")
     
     if not db_user.is_active:
-        raise HTTPException(403,"User disabled")
+        raise HTTPException(403, "User disabled")
 
     token = auth_service.create_access_token({"sub": db_user.username})
 
     return {
         "access_token": token,
-        "role": db_user.role}
+        "role": db_user.role
+    }
