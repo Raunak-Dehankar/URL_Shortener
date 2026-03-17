@@ -4,7 +4,7 @@ from Backend.Models.user import User
 from Backend.Services.auth_service import AuthService
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from Backend.Routers.ui_router import router as ui_router
+from Frontend.UIRouter.ui_router import router as ui_router
 from Backend.Routers.user_router import router as user_router
 from Backend.Routers.url_router import router as url_router
 from Backend.Routers.admin_router import router as admin_router
