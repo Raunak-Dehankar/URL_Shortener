@@ -75,7 +75,7 @@ http://127.0.0.1:8000
 ![alt text](<Readme-images/succ link adding-1.png>)
 ![alt text](<Readme-images/incorrect or repeated link genrated-1.png>)
 
-7. User can then create unique QR codes for their shortened links from the list to easily share via image. 
+7. User can then create unique QR codes for their shortened links from the list to easily share via Readme-images 
 
 ![alt text](<Readme-images/qr for shortened link-1.png>)
 
