@@ -25,50 +25,7 @@ This project is a full-stack URL shortener web application built using Python wi
 
 ## Repository structure 
 
-URL_Shortener/
-│
-├── main.py
-├── requirements.txt
-│
-├── Backend/
-│   │
-│   ├── database.py
-│   │
-│   ├── Models/
-│   │   ├── models.py
-│   │   └── user.py
-│   │
-│   ├── ViewModels/
-│   │   ├── usercreate_schema.py
-│   │   ├── userlogin_schema.py
-│   │   └── URLrequest_schema.py
-│   │
-│   ├── Services/
-│   │   ├── auth_service.py
-│   │   ├── url_service.py
-│   │   └── utils.py
-│   │
-│   └── Routers/
-│       ├── ui_router.py
-│       ├── user_router.py
-│       ├── url_router.py
-│       └── admin_router.py
-│
-├── Frontend/
-│   │
-│   ├── templates/
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   ├── dashboard.html
-│   │   └── admin.html
-│   │
-│   └── static/
-│       ├── script.js
-│       ├── admin.js
-│       ├── styles.css
-│       └── (qr library if any)
-│
-└── urls.db
+![alt text](Readme-images/structure.png)
 
 ## Setup and Usage
 
